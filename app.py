@@ -7,6 +7,7 @@ import yfinance as yf
 from datetime import date
 import pandas as pd
 from prophet import Prophet
+from prophet.plot import plot_components_plotly
 from plotly import graph_objs as go
 
 # =========================
@@ -245,6 +246,9 @@ fig_forecast.update_layout(
 )
 st.plotly_chart(fig_forecast, use_container_width=True)
 
+# =============================
+# Rodapé e informações da desenvolvedora
+# =============================
 st.markdown(
     """
     <hr>
