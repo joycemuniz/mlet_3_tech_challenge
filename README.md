@@ -2,7 +2,7 @@
 
 ## 🚀 Objetivo
 
-Este projeto foi desenvolvido como parte do **3° Tech Challenge - Pós Tech FIAP (Machine Learning Engineering)**. Ele tem como objetivo criar um produto de dados capaz de realizar a **coleta das ações que compõem a carteira do Ibovespa** por meio de um scraper, armazenar os dados em formato **Parquet** em um **bucket S3**, disponibilizar a lista de ações através de uma **API construída em FastAPI** e, posteriormente, consumi-la em um **aplicativo Streamlit**. O aplicativo consulta informações históricas de preços pela **API do Yahoo Finance** e aplica técnicas de análise e previsão utilizando a biblioteca **Prophet (Meta/Facebook)**.
+Este projeto foi desenvolvido como parte do **3° Tech Challenge - Pós Tech FIAP (Machine Learning Engineering)**. Ele tem como objetivo criar um produto de dados capaz de realizar a **coleta das ações que compõem a carteira do Ibovespa** por meio de um scraper, realizar o armazenamento dos dados em formato **Parquet** em um **bucket S3**, disponibilizar a lista de ações através de uma **API construída em FastAPI** e, posteriormente, consumi-la em um **aplicativo Streamlit**. O aplicativo consulta informações históricas de preços pela **API do Yahoo Finance** e aplica técnicas de análise e previsão utilizando a biblioteca **Prophet (Meta/Facebook)**.
 
 ---
 
