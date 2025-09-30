@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 import os, time, io
 import pandas as pd
 import boto3
+from botocore.config import Config
 
 # ===================================================
 # Configurações via variáveis de ambiente
@@ -52,7 +53,13 @@ app.add_middleware(
 # Cliente S3 e Cache
 # ===================================================
 
-_s3 = boto3.client("s3")
+REGION = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
+
+_s3 = boto3.client(
+    "s3",
+    region_name=REGION,
+    config=Config(signature_version="s3v4")
+)
 _cache = {"ts": 0.0, "dados_cache": None}
 
 def carregar_latest_do_s3() -> pd.DataFrame:
