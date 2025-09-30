@@ -53,13 +53,7 @@ app.add_middleware(
 # Cliente S3 e Cache
 # ===================================================
 
-REGION = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
-
-_s3 = boto3.client(
-    "s3",
-    region_name=REGION,
-    config=Config(signature_version="s3v4")
-)
+_s3 = boto3.client("s3", region_name="us-east-1")
 _cache = {"ts": 0.0, "dados_cache": None}
 
 def carregar_latest_do_s3() -> pd.DataFrame:

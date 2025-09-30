@@ -30,7 +30,7 @@ n_dias = st.sidebar.slider('Selecione quantidade de dias para a previsão', 7, 6
 # =========================
 import requests
 
-url_api = "http://127.0.0.1:8000"
+url_api = "https://mlet-3-tech-challenge.onrender.com"
 
 @st.cache_data(ttl=600)
 def pegar_dados_acoes():
@@ -40,10 +40,6 @@ def pegar_dados_acoes():
         return pd.DataFrame()
     data = resp.json()
     return pd.DataFrame(data)
-
-#def pegar_dados_acoes():
-#    path = r'C:\Users\Joyce\Python\mlet_3_tech_challenge\output\carteira_ibov.parquet'
-#    return pd.read_parquet(path)
 
 df = pegar_dados_acoes()
 
