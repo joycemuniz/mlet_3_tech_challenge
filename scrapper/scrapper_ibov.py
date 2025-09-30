@@ -1,4 +1,6 @@
-#Import das bibliotecas
+# ===================================================
+# Import das bibliotecas utilizadas
+# ===================================================
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -9,7 +11,9 @@ from datetime import datetime
 import pandas as pd
 import boto3, io, os, time, re
 
-# Configurações do Selenium
+# ===================================================
+# Configurações do Selenium e Scrapper do site 
+# ===================================================
 options = Options()
 options.add_argument('--headless')
 options.add_argument('--no-sandbox')
@@ -21,21 +25,19 @@ driver.get(url)
 
 wait = WebDriverWait(driver, 10)
 
-# Selecionar "120" resultados por página
+# Selecionando "120" resultados por página
 select_element = wait.until(EC.presence_of_element_located((By.ID, "selectPage")))
 Select(select_element).select_by_visible_text("120")
-time.sleep(3)  # esperar a tabela recarregar
-
-# Coletar HTML renderizado
+time.sleep(3)
 html = driver.page_source
 soup = BeautifulSoup(html, "html.parser")
 
-# ➤ Extrair a data do título da carteira
+# Pegando a data das informações do site
 titulo = soup.find("h2")
 data_str = titulo.get_text(strip=True).split("-")[-1].strip()  # "03/07/25"
 data_html = datetime.strptime(data_str, "%d/%m/%y").strftime("%Y%m%d")
 
-# ➤ Extrair tabela
+# Extraindo a tabela tabela
 tabela = soup.find("table", class_="table table-responsive-sm table-responsive-md")
 
 cabecalhos = [th.get_text(strip=True) for th in tabela.find("thead").find_all("th")]
@@ -46,7 +48,9 @@ for linha in tabela.find("tbody").find_all("tr"):
 
 df = pd.DataFrame(dados, columns=cabecalhos)
 
-# Criar nova coluna com valores de Ação e Tipo
+# ===================================================
+# Criando nova coluna e salvando arquivos em parquet
+# ===================================================
 
 def _tipo3(s: str) -> str:
     s = str(s).upper()
@@ -63,15 +67,14 @@ def _tipo3(s: str) -> str:
 df["Tipo3"] = df["Tipo"].apply(_tipo3)
 df["Acao_Tipo"] = df["Ação"].astype(str).str.strip() + " - " + df["Tipo3"]
 
-# ➤ Salvar em Parquet com nome da data
 os.makedirs("output", exist_ok=True)
 caminho_parquet_historico = f"output/carteira_ibov_{data_html}.parquet"
 caminho_parquet = f"output/carteira_ibov.parquet"
 df.to_parquet(caminho_parquet, index=False, engine="pyarrow")
 df.to_parquet(caminho_parquet_historico, index=False, engine="pyarrow")
 
-print(f"✅ Dados extraídos da data: {data_html}")
-print(f"📦 Arquivo salvo em: {caminho_parquet}")
+print(f"Dados extraídos da data: {data_html}")
+print(f"Arquivo salvo em: {caminho_parquet}")
 
 # =========================
 # AWS - S3
@@ -82,24 +85,24 @@ BUCKET = "mlet-3-tech-challenge"
 s3 = boto3.client("s3")
 
 try:
-    # Envia a versão "latest"
+    # Envio da versão "latest"
     s3.upload_file(
         Filename=caminho_parquet,
         Bucket=BUCKET,
         Key="latest/carteira_ibov.parquet"
     )
 
-    # Envia a versão histórica (com a data no nome)
+    # Envio da versão histórica
     s3.upload_file(
         Filename=caminho_parquet_historico,
         Bucket=BUCKET,
         Key=f"historico/carteira_ibov_{data_html}.parquet"
     )
 
-    print(f"📤 Upload feito para s3://{BUCKET}/latest/carteira_ibov.parquet")
-    print(f"📤 Upload feito para s3://{BUCKET}/historico/carteira_ibov_{data_html}.parquet")
+    print(f"Upload efetuado para o s3://{BUCKET}/latest/carteira_ibov.parquet")
+    print(f"Upload efetuado para o s3://{BUCKET}/historico/carteira_ibov_{data_html}.parquet")
 
 except Exception as e:
-    print("❌ Erro ao enviar para o S3:", e)
+    print("Erro ao enviar para o S3:", e)
 
 driver.quit()
